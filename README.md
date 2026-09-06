@@ -50,6 +50,40 @@ cargo build --release
 
 The binary will be at `target/release/copilot-api-proxy`.
 
+### With Docker
+
+A multi-stage `Dockerfile` builds a slim runtime image that exposes port `9876`.
+
+```bash
+# Build locally
+docker build -t copilot-api-proxy .
+
+# Run (mount your token directory so auth persists)
+docker run --rm -p 9876:9876 \
+  -v ~/.local/share/copilot-api-proxy:/home/appuser/.local/share/copilot-api-proxy \
+  copilot-api-proxy
+```
+
+Prebuilt images are published to the GitHub Container Registry on every push to
+the default branch and on version tags:
+
+```bash
+docker pull ghcr.io/needsaholiday/copilot-api-proxy:latest
+```
+
+## Continuous Integration and Delivery
+
+Two GitHub Actions workflows live in `.github/workflows/`:
+
+- **CI** (`ci.yml`) runs on pushes and pull requests to `main`/`master`. It
+  checks formatting (`cargo fmt`), runs `cargo clippy`, builds, and runs the
+  test suite.
+- **CD** (`cd.yml`) runs on pushes to `main`/`master` and on `v*` tags. It
+  re-runs lint and tests, then builds the Docker image and publishes it to
+  `ghcr.io/<owner>/<repo>` using the built-in `GITHUB_TOKEN` (no extra secrets
+  required). Tags include `latest` (default branch), the branch name, the commit
+  SHA, and semantic-version tags for `v*` releases.
+
 ## Quick Start
 
 ### 1. Authenticate once
