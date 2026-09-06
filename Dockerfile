@@ -36,11 +36,11 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --create-home --uid 10001 appuser
 
-WORKDIR /home/appuser
+WORKDIR /root
 
 COPY --from=builder /app/target/release/copilot-api-proxy /usr/local/bin/copilot-api-proxy
 
-USER appuser
+USER root
 
 EXPOSE 9876
 
