@@ -4,6 +4,7 @@
 .gitignore
 Dockerfile
 .dockerignore
+docker-compose.yml
 .github
 README.md
 *.md

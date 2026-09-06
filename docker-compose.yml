@@ -1,0 +1,26 @@
+services:
+  copilot-api-proxy:
+    # Build the local Dockerfile, or comment `build` and uncomment `image`
+    # to use the prebuilt image published to GHCR.
+    build: .
+    # image: ghcr.io/needsaholiday/copilot-api-proxy:latest
+    container_name: copilot-api-proxy
+    restart: unless-stopped
+    ports:
+      - "9876:9876"
+    # Persist the GitHub token across container restarts so you only need to
+    # authenticate once. The token is written to
+    # /home/appuser/.local/share/copilot-api-proxy/github_token inside the
+    # container, which the named volume below keeps around.
+    volumes:
+      - copilot-token:/home/appuser/.local/share/copilot-api-proxy
+    environment:
+      # Optional overrides. Uncomment as needed.
+      # - GITHUB_TOKEN=your_github_token        # Skip device-flow auth entirely.
+      # - ANTHROPIC_API_KEY=your-secret-key     # Require a key on /v1/messages.
+      # - RUST_LOG=copilot_api_proxy=debug,tower_http=debug
+      - RUST_LOG=copilot_api_proxy=info
+    command: ["server", "--port", "9876"]
+
+volumes:
+  copilot-token:
