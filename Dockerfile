@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---- Builder ----
-FROM rust:1.90-slim-bookworm AS builder
+FROM rust:1.91-slim-bookworm AS builder
 
 # Install build dependencies required by common crates (openssl/pkg-config).
 RUN apt-get update \
