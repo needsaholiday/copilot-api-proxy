@@ -71,6 +71,41 @@ the default branch and on version tags:
 docker pull ghcr.io/needsaholiday/copilot-api-proxy:latest
 ```
 
+### With Docker Compose
+
+A ready-to-use [`docker-compose.yml`](docker-compose.yml) is included. It builds
+the image, exposes port `9876`, and stores the GitHub token in a named volume so
+you only have to authenticate once.
+
+```bash
+# Start the proxy in the background
+docker compose up -d
+```
+
+Because the container has no GitHub token yet, the proxy responds with auth
+errors until you initialize authentication. Run the GitHub OAuth device flow
+**once** inside the running container:
+
+```bash
+# Run the interactive device-flow auth inside the running container
+docker compose exec copilot-api-proxy copilot-api-proxy auth
+```
+
+The command prints a GitHub verification URL and a user code. Open the URL in a
+browser, enter the code, and approve access. The resulting token is written to
+`/home/appuser/.local/share/copilot-api-proxy/github_token`, which is persisted
+by the `copilot-token` named volume. Restart the proxy so it picks up the new
+token:
+
+```bash
+docker compose restart copilot-api-proxy
+```
+
+Subsequent `docker compose up`/`restart` cycles reuse the stored token, so you
+do not need to authenticate again unless the volume is removed. Alternatively,
+set `GITHUB_TOKEN` in the compose `environment` block to skip the device flow
+entirely.
+
 ## Continuous Integration and Delivery
 
 Two GitHub Actions workflows live in `.github/workflows/`:
